@@ -6,6 +6,8 @@ Airbase is a discovery workspace for AI models and tools. The product direction 
 
 This repository contains a front-end product preview with a sample model catalog, a tool directory, searchable model facets, browser-local bookmarks, a three-model comparison workspace, and a Firebase email/password account entry point. The requested cursor-reactive logo field is built as a small Airbase component and does not depend on a third-party animation package.
 
+The model directory now supports capability/provider filters, sample-metric sorting, and grid/list presentation. Model cards use restrained pointer spotlights inspired by ReactBits interaction patterns; motion is reduced for users who request it, and the homepage spotlight is manually navigated rather than autoplayed. See [`UI-DESIGN-PROMPT.md`](./UI-DESIGN-PROMPT.md) for the researched UI brief and references.
+
 The catalog is illustrative. Pricing, ratings, run counts, uptime, latency, and benchmark scores are not live or independently verified. Provider execution, tool launching, account-backed storage, live catalog ingestion, and benchmark provenance are not enabled yet. The preview explicitly labels these boundaries rather than implying a working provider gateway.
 
 ## Run locally
