@@ -1,84 +1,46 @@
 import Link from "next/link"
-import { Sparkles } from "lucide-react"
+import { Boxes } from "lucide-react"
 
 const footerLinks = {
-  "Platform": [
-    { label: "Browse Models", href: "/models" },
-    { label: "Categories", href: "/models" },
-    { label: "Trending", href: "/models?sort=trending" },
-    { label: "Scanner", href: "/scanner" },
+  Explore: [
+    { label: "Browse models", href: "/models" },
+    { label: "AI tools", href: "/tools" },
+    { label: "Compare models", href: "/compare" },
   ],
-  "Resources": [
-    { label: "Documentation", href: "#" },
-    { label: "API Reference", href: "#" },
-    { label: "Benchmarks", href: "#" },
-    { label: "Changelog", href: "#" },
+  Workspace: [
+    { label: "Create an account", href: "/signup" },
+    { label: "Saved items", href: "/dashboard" },
   ],
-  "Company": [
-    { label: "About", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Careers", href: "#" },
-    { label: "Contact", href: "#" },
+  Project: [
+    { label: "Product preview", href: "/" },
+    { label: "Catalog notes", href: "/models" },
   ],
 }
 
 export function Footer() {
   return (
-    <footer className="border-t border-fog-white bg-pure-white">
-      <div className="mx-auto max-w-page-max px-6 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {/* Brand */}
+    <footer className="mt-16 border-t border-slate-200 bg-white">
+      <div className="mx-auto max-w-page-max px-6 py-12">
+        <div className="grid grid-cols-2 gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="flex items-center justify-center w-8 h-8 bg-atlassian-blue rounded-radius-md">
-                <Sparkles className="w-4 h-4 text-pure-white" />
-              </div>
-              <span className="font-charlie-display font-bold text-heading-sm text-midnight-navy">
-                Hacker<span className="text-atlassian-blue">AI</span>
-              </span>
+            <Link href="/" className="mb-4 inline-flex items-center gap-2.5" aria-label="Airbase home">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-slate-950 text-cyan-200"><Boxes className="h-[18px] w-[18px]" /></span>
+              <span className="font-charlie-display text-xl font-bold tracking-[-0.06em] text-slate-950">airbase<span className="text-blue-600">.</span></span>
             </Link>
-            <p className="text-body text-muted-indigo leading-body max-w-xs">
-              The App Store for AI Models — browse, compare, test, and deploy AI models from hundreds of providers.
-            </p>
+            <p className="max-w-xs text-sm leading-6 text-slate-500">A calmer way to discover, compare, and choose the right AI for the work.</p>
           </div>
-
-          {/* Link columns */}
           {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
-              <h4 className="font-medium text-caption text-midnight-navy mb-4 uppercase tracking-wider">
-                {title}
-              </h4>
+              <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">{title}</h2>
               <ul className="space-y-3">
-                {links.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-body text-muted-indigo hover:text-atlassian-blue transition-colors"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
+                {links.map((link) => <li key={link.label}><Link href={link.href} className="text-sm text-slate-600 transition hover:text-blue-700">{link.label}</Link></li>)}
               </ul>
             </div>
           ))}
         </div>
-
-        <div className="mt-12 pt-8 border-t border-fog-white flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-caption text-muted-indigo">
-            &copy; {new Date().getFullYear()} HackerAI. All rights reserved.
-          </p>
-          <div className="flex gap-6">
-            <Link href="#" className="text-caption text-muted-indigo hover:text-atlassian-blue transition-colors">
-              Privacy
-            </Link>
-            <Link href="#" className="text-caption text-muted-indigo hover:text-atlassian-blue transition-colors">
-              Terms
-            </Link>
-            <Link href="#" className="text-caption text-muted-indigo hover:text-atlassian-blue transition-colors">
-              Cookies
-            </Link>
-          </div>
+        <div className="mt-10 flex flex-col justify-between gap-3 border-t border-slate-100 pt-6 text-xs text-slate-400 sm:flex-row">
+          <p>© {new Date().getFullYear()} Airbase. Preview catalog contains illustrative sample data.</p>
+          <p>One Airbase account · provider execution is not enabled in this preview</p>
         </div>
       </div>
     </footer>

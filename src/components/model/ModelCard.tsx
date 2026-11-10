@@ -1,128 +1,42 @@
 "use client"
 
 import Link from "next/link"
+import { useState } from "react"
 import { motion } from "framer-motion"
-import { Heart, Clock, Star } from "lucide-react"
+import { ArrowUpRight, Heart, Layers3, Star } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { cn } from "@/lib/utils"
-import { formatCurrency, formatLatency, formatNumber } from "@/lib/utils"
+import { cn, formatCurrency, formatLatency, formatNumber } from "@/lib/utils"
+import { readCatalogIds, toggleCatalogId, useCatalogIds } from "@/lib/catalog-storage"
 import type { AIModel } from "@/lib/types"
 
-interface ModelCardProps {
-  model: AIModel
-  featured?: boolean
-  index?: number
-}
+interface ModelCardProps { model: AIModel; featured?: boolean; index?: number }
 
 export function ModelCard({ model, featured, index = 0 }: ModelCardProps) {
-  const { pricing } = model
+  const [compareLimit, setCompareLimit] = useState(false)
+  const saved = useCatalogIds("savedModels").includes(model.id)
+  const compared = useCatalogIds("compareModels").includes(model.id)
+
+  const toggleCompare = () => {
+    setCompareLimit(false)
+    const current = readCatalogIds("compareModels")
+    if (!current.includes(model.id) && current.length >= 3) { setCompareLimit(true); return }
+    toggleCatalogId("compareModels", model.id)
+  }
+
+  const unit = model.pricing.unit === "per_request" ? " / request" : model.pricing.unit === "per_second" ? " / second" : " / token unit"
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.4, delay: index * 0.05 }}
-    >
-      <Link href={`/models/${model.slug}`}>
-        <div
-          className={cn(
-            "group relative rounded-radius-cards bg-pure-white border border-fog-white p-5",
-            "transition-all duration-300 hover:shadow-card-hover hover:scale-[1.02]",
-            "flex flex-col gap-3 h-full",
-            featured && "border-atlassian-blue/20"
-          )}
-        >
-          {/* Header */}
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-radius-xl bg-surface-tinted-surface flex items-center justify-center shrink-0">
-                <span className="text-caption font-bold text-atlassian-blue">
-                  {model.author.charAt(0)}
-                </span>
-              </div>
-              <div>
-                <p className="text-caption text-muted-indigo">{model.author}</p>
-                <h3 className="font-charlie-display font-medium text-subheading text-midnight-navy leading-tight">
-                  {model.name}
-                </h3>
-              </div>
-            </div>
-            <motion.button
-              whileHover={{ scale: 1.2 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-              }}
-              className="p-1.5 text-muted-indigo hover:text-red-500 hover:bg-red-50 rounded-radius-md transition-colors"
-              aria-label="Save model"
-            >
-              <Heart className="w-4 h-4" />
-            </motion.button>
-          </div>
-
-          {/* Rating */}
-          <div className="flex items-center gap-1.5">
-            <Star className="w-3.5 h-3.5 fill-taxicab-yellow text-taxicab-yellow" />
-            <span className="text-caption font-medium text-midnight-navy">{model.stats.avgRating}</span>
-            <span className="text-caption text-muted-indigo">
-              ({formatNumber(model.stats.reviewCount)})
-            </span>
-          </div>
-
-          {/* Description */}
-          <p className="text-caption text-muted-indigo leading-relaxed line-clamp-2">
-            {model.description}
-          </p>
-
-          {/* Tags */}
-          <div className="flex flex-wrap gap-1.5">
-            {model.tags.slice(0, 3).map((tag) => (
-              <Badge key={tag} variant="default" className="text-[11px] px-2 py-0.5">
-                #{tag}
-              </Badge>
-            ))}
-          </div>
-
-          {/* Pricing */}
-          <div className="flex gap-4 text-caption">
-            <span className="text-muted-indigo">
-              Input: <span className="font-medium text-midnight-navy">{formatCurrency(pricing.input)}/{pricing.unit === "per_token" ? "k" : "req"}</span>
-            </span>
-            <span className="text-muted-indigo">
-              Output: <span className="font-medium text-midnight-navy">{formatCurrency(pricing.output)}/{pricing.unit === "per_token" ? "k" : "req"}</span>
-            </span>
-          </div>
-
-          {/* Demand + Latency */}
-          <div className="flex items-center gap-4 mt-auto">
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-caption text-muted-indigo">Demand</span>
-                <span className="text-caption font-medium text-midnight-navy">{model.demand}%</span>
-              </div>
-              <Progress value={model.demand} className="h-1.5" />
-            </div>
-            <div className="flex items-center gap-1 text-caption text-muted-indigo shrink-0">
-              <Clock className="w-3 h-3" />
-              {formatLatency(model.avgLatencyMs)}
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex gap-2 mt-1">
-            <Button variant="default" size="sm" radius="full" className="flex-1 text-caption">
-              Try Now
-            </Button>
-            <Button variant="outline" size="sm" radius="full" className="text-caption">
-              Details
-            </Button>
-          </div>
-        </div>
-      </Link>
-    </motion.div>
+    <motion.article initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.35, delay: Math.min(index * 0.035, 0.2) }} className={cn("group flex h-full flex-col rounded-[20px] border bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover", featured ? "border-blue-200" : "border-slate-200")}>
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <Link href={`/models/${model.slug}`} className="flex min-w-0 items-center gap-3 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-blue-500"><span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-slate-950 text-sm font-bold tracking-tight text-white" aria-hidden="true">{model.author.slice(0, 2).toUpperCase()}</span><span className="min-w-0"><span className="block text-xs font-medium text-slate-500">{model.author}</span><span className="block truncate font-charlie-display text-base font-semibold text-slate-950 group-hover:text-blue-700">{model.name}</span></span></Link>
+        <button type="button" onClick={() => toggleCatalogId("savedModels", model.id)} aria-label={saved ? `Remove ${model.name} from saved models` : `Save ${model.name}`} aria-pressed={saved} className={cn("rounded-xl p-2 transition", saved ? "bg-rose-50 text-rose-600" : "text-slate-400 hover:bg-slate-100 hover:text-rose-500")}><Heart className={cn("h-4 w-4", saved && "fill-current")} /></button>
+      </div>
+      <div className="mb-3 flex items-center gap-1.5 text-xs" title="Illustrative sample rating, not a verified live review score"><Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /><span className="font-semibold text-slate-800">{model.stats.avgRating.toFixed(1)}</span><span className="text-slate-400">sample rating · {formatNumber(model.stats.reviewCount)} sample reviews</span></div>
+      <p className="mb-4 line-clamp-2 min-h-[40px] text-xs leading-5 text-slate-600">{model.description}</p>
+      <div className="mb-4 flex min-h-7 flex-wrap gap-1.5">{model.tags.slice(0, 3).map((tag) => <Badge key={tag} variant="default" className="text-[10px]">{tag}</Badge>)}</div>
+      <div className="mb-4 grid grid-cols-2 gap-3 rounded-2xl bg-slate-50 p-3"><div><p className="text-[10px] uppercase tracking-wide text-slate-400">Input · sample</p><p className="mt-1 text-xs font-semibold text-slate-800">{formatCurrency(model.pricing.input)}{unit}</p></div><div><p className="text-[10px] uppercase tracking-wide text-slate-400">Latency · sample</p><p className="mt-1 text-xs font-semibold text-slate-800">{formatLatency(model.avgLatencyMs)}</p></div></div>
+      <div className="mt-auto flex items-center justify-between gap-2 border-t border-slate-100 pt-3"><Link href={`/models/${model.slug}`} className="inline-flex items-center gap-1 text-xs font-semibold text-blue-700 hover:text-blue-900">Model details <ArrowUpRight className="h-3.5 w-3.5" /></Link><button type="button" onClick={toggleCompare} aria-pressed={compared} className={cn("inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition", compared ? "bg-blue-50 text-blue-700" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900")}><Layers3 className="h-3.5 w-3.5" />{compared ? "Added" : "Compare"}</button></div>
+      {compareLimit && <p className="mt-2 text-right text-[10px] text-amber-700">Compare up to 3 models.</p>}
+    </motion.article>
   )
 }
